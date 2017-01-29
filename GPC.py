@@ -12,16 +12,22 @@ def getUnitFactor(UnitFrom, UnitTo):
     if UnitFrom in UnitList and UnitTo in UnitList:
         return 1 / UnitList[UnitFrom] * UnitList[UnitTo]
     else:
-        raise Exception('Unsupported unit name!')
+        print('Unsupported unit name!')
+        raise Exception('UnitError')
 
 def getCurrencyFactor(CurrencyFrom, CurrencyTo):
-    supportedCurrencies = ["EUR","USD","JPY","BGN","CZK","DKK","GBP","HUF","PLN","RON","SEK","CHF","NOK","HRK","RUB","TRY","AUD","BRL","CAD","CNY","HKD","IDR","ILS","INR","KRW","MXN","MYR","NZD","PHP","SGD","THB","ZAR"]
+    supportedCurrencies = [
+    "EUR","USD","JPY","BGN","CZK","DKK","GBP","HUF",
+    "PLN","RON","SEK","CHF","NOK","HRK","RUB","TRY",
+    "AUD","BRL","CAD","CNY","HKD","IDR","ILS","INR",
+    "KRW","MXN","MYR","NZD","PHP","SGD","THB","ZAR"]
+
     if CurrencyTo in supportedCurrencies and CurrencyFrom in supportedCurrencies:
         if CurrencyFrom != CurrencyTo:
             url = "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
             s = urllib.request.urlopen(url)
             contentsXML = s.read()
-            xml1 = contentsXML.decode()#.partition('<cube>')
+            xml1 = contentsXML.decode()
             xml2 = xml1.partition("<Cube>")[2].partition("</Cube>")[0]+ "</Cube>"
             Factor = Decimal(1)
 
@@ -30,18 +36,18 @@ def getCurrencyFactor(CurrencyFrom, CurrencyTo):
                 Factor = 1 / Decimal(re.findall("\d*\.\d*", line[0])[0])
             else:
                 Factor = Factor
+
             if CurrencyTo != 'EUR':
                 line2 = re.findall("currency=.*" + CurrencyTo + ".*\'.*\'",xml2)
                 Factor *= Decimal(re.findall("\d*\.\d*", line2[0])[0])
-            else:
-                Factor *= 1
-        else:
-            Factor = 1
+
         return Factor
+
     else:
-        raise Exception('Unsupported currency name!')
+        print('Unsupported currency name!')
+        raise Exception('CurrencyError')
 def main():
-    if len(sys.argv) == 6:
+    if len(sys.argv) >= 6:
         StartValue = Decimal(sys.argv[1].replace(",",".")) #To get both decimal seperators
         StartCurrency = sys.argv[2].upper()
         StartUnit = sys.argv[3]
@@ -51,8 +57,7 @@ def main():
         try:
             UnitFactor = getUnitFactor        (StartUnit, GoalUnit)
             CurrencyFactor = getCurrencyFactor(StartCurrency, GoalCurrency)
-        except:
-            print("Error")
+        except Exception:
             return 0
 
         GoalValue = StartValue * UnitFactor * CurrencyFactor

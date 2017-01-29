@@ -61,3 +61,7 @@ The allowed Currencies are
 * THB
 
 The courses are taken from the European Central Bank
+
+ ## Dependencies
+ * requests
+ * urllib

@@ -39,8 +39,6 @@ def getCurrencyFactor(CurrencyFrom, CurrencyTo):
             if CurrencyFrom != 'EUR':
                 line = re.findall("currency=.*" + CurrencyFrom + ".*\'.*\'",xml2)
                 Factor = 1 / Decimal(re.findall("\d*\.\d*", line[0])[0])
-            else:
-                Factor = Factor
 
             #Convert Base to Goal Currency
             if CurrencyTo != 'EUR':
@@ -52,13 +50,19 @@ def getCurrencyFactor(CurrencyFrom, CurrencyTo):
     else:
         print('Unsupported currency name!')
         raise Exception('CurrencyError')
+
 def main():
     if len(sys.argv) >= 6:
-        StartValue    = Decimal(sys.argv[1].replace(",",".")) #To get both decimal seperators
-        StartCurrency =         sys.argv[2].upper()
-        StartUnit     =         sys.argv[3].lower()
-        GoalCurrency  =         sys.argv[4].upper()
-        GoalUnit      =         sys.argv[5].lower()
+        StartValue    = sys.argv[1].replace(",",".") #To get both decimal seperators
+        StartCurrency = sys.argv[2].upper()
+        StartUnit     = sys.argv[3].lower()
+        GoalCurrency  = sys.argv[4].upper()
+        GoalUnit      = sys.argv[5].lower()
+        try:
+            StartValue= Decimal(StartValue)
+        except:
+            print("Not a valid value Number")
+            return 0
 
         try:
             UnitFactor     = getUnitFactor    (StartUnit, GoalUnit)
@@ -70,6 +74,6 @@ def main():
 
         print(str(StartValue)     + " " + StartCurrency + "/" + StartUnit + " Converts to")
         print(str(GoalValue)[0:6] + " " + GoalCurrency +  "/" + GoalUnit)
-
+        return(GoalValue)
 if 1 == 1:
     main()
